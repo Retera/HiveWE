@@ -1,9 +1,7 @@
 ﻿#include "stdafx.h"
 
 void Unit::update() {
-	matrix = glm::translate(glm::mat4(1.f), position);
-	matrix = glm::scale(matrix, scale / 128.f);
-	matrix = glm::rotate(matrix, angle, glm::vec3(0, 0, 1));
+	modelInstance->updateLocation(position, angle, scale);
 }
 
 bool Units::load(BinaryReader& reader, Terrain& terrain) {
@@ -223,18 +221,22 @@ void Units::create() {
 			i.scale = glm::vec3(std::stof(units_slk.data("modelScale", i.id)));
 		}
 
+		i.mesh = get_mesh(i.id);
+		i.modelInstance = std::make_shared<SkeletalModelInstance>(i.mesh->model);
 		i.update();
 
 		tree.insert(&i);
-		i.mesh = get_mesh(i.id);
+		// used to get mesh after adding to tree ???
 	}	
 	for (auto&& i : items) {
 		i.scale = glm::vec3(std::stof(items_slk.data("scale", i.id)));
 
+		i.mesh = get_mesh(i.id);
+		i.modelInstance = std::make_shared<SkeletalModelInstance>(i.mesh->model);
 		i.update();
 
 		tree.insert(&i);
-		i.mesh = get_mesh(i.id);
+		// used to get mesh after adding to tree
 	}
 }
 
@@ -244,14 +246,16 @@ void Units::render() const {
 			continue;
 		} // ToDo handle starting locations
 
-		i.mesh->render_queue(i.matrix);
+		i.modelInstance->updateTimer();
+		i.mesh->render_queue(i.modelInstance);
 	}
 	for (auto&& i : items) {
-		i.mesh->render_queue(i.matrix);
+		i.modelInstance->updateTimer();
+		i.mesh->render_queue(i.modelInstance);
 	}
 }
 
-std::shared_ptr<StaticMesh> Units::get_mesh(const std::string& id) {
+std::shared_ptr<AnimatedMesh> Units::get_mesh(const std::string& id) {
 	if (id_to_mesh.find(id) != id_to_mesh.end()) {
 		return id_to_mesh[id];
 	}
@@ -265,11 +269,11 @@ std::shared_ptr<StaticMesh> Units::get_mesh(const std::string& id) {
 	// Mesh doesnt exist at all
 	if (!hierarchy.file_exists(mesh_path)) {
 		std::cout << "Invalid model file for " << id << " With file path: " << mesh_path << "\n";
-		id_to_mesh.emplace(id, resource_manager.load<StaticMesh>("Objects/Invalidmodel/Invalidmodel.mdx"));
+		id_to_mesh.emplace(id, resource_manager.load<AnimatedMesh>("Objects/Invalidmodel/Invalidmodel.mdx"));
 		return id_to_mesh[id];
 	}
 
-	id_to_mesh.emplace(id, resource_manager.load<StaticMesh>(mesh_path));
+	id_to_mesh.emplace(id, resource_manager.load<AnimatedMesh>(mesh_path));
 
 	return id_to_mesh[id];
 }

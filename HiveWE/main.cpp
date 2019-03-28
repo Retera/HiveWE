@@ -15,6 +15,7 @@ class TT : public Doodad {
 };
 
 int main(int argc, char *argv[]) {
+
 	std::stack<Doodad*> triggerItems;
 	triggerItems.push(new TT());
 

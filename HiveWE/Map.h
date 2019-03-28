@@ -36,6 +36,7 @@ public:
 
 	// For instancing
 	std::vector<StaticMesh*> meshes;
+	std::vector<AnimatedMesh*> animatedMeshes;
 
 	double terrain_time;
 	double terrain_tiles_time;

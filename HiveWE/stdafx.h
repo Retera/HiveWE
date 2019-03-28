@@ -34,13 +34,18 @@ namespace fs = std::filesystem;
 #define GLM_FORCE_CXX17
 #define GLM_FORCE_RADIANS
 #include <glm.hpp>
+#define GLM_ENABLE_EXPERIMENTAL 
 #include <gtc/matrix_transform.hpp>
+#include <gtx/quaternion.hpp>
+#include <gtx/vector_angle.hpp>
 #ifdef _MSC_VER
 #include <SOIL2.h>
 #else
 #include <SOIL/SOIL.h>
 #endif
 #include <turbojpeg.h>
+
+#include <gtx/matrix_decompose.hpp>
 
 // Custom Qt Widgets
 #ifdef _DEBUG
@@ -84,6 +89,12 @@ namespace fs = std::filesystem;
 #include "Shader.h"
 #include "StaticMesh.h"
 #include "SkinnedMesh.h"
+#include "AnimatedMesh.h"
+
+#include "RenderNode.h"
+#include "SkeletalModelInstance.h"
+// These templates need definitions of both SkeletalModelInstance, and MDX:
+#include "MDXRenderTemplates.h"
 
 #include "TriggerStrings.h"
 #include "Triggers.h"

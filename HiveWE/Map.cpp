@@ -307,7 +307,12 @@ void Map::render(int width, int height) {
 	// Render all meshes
 	begin = std::chrono::high_resolution_clock::now();
 
+	// ToDo won't this need to become renderStep1 and renderStep2 based
+	// on which are additive layers?
 	for (auto&& i : meshes) {
+		i->render();
+	}
+	for (auto&& i : animatedMeshes) {
 		i->render();
 	}
 

@@ -39,14 +39,14 @@ struct Unit {
 	int waygate;
 	int creation_number;
 
-	glm::mat4 matrix = glm::mat4(1.f);
-	std::shared_ptr<StaticMesh> mesh;
+	std::shared_ptr<SkeletalModelInstance> modelInstance;
+	std::shared_ptr<AnimatedMesh> mesh;
 
 	void update();
 };
 
 class Units {
-	std::unordered_map<std::string, std::shared_ptr<StaticMesh>> id_to_mesh;
+	std::unordered_map<std::string, std::shared_ptr<AnimatedMesh>> id_to_mesh;
 
 	static constexpr int write_version = 8;
 	static constexpr int write_subversion = 11;
@@ -63,5 +63,5 @@ public:
 	void create();
 	void render() const;
 
-	std::shared_ptr<StaticMesh> get_mesh(const std::string& id);
+	std::shared_ptr<AnimatedMesh> get_mesh(const std::string& id);
 };

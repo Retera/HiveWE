@@ -21,6 +21,13 @@ struct Camera {
 	glm::mat4 view = glm::lookAt(position, position + direction, glm::vec3(0, 0, 1));
 	glm::mat4 projection_view;
 
+	// Used for decomposing camera information to get rotation, for camera-centric Billboarded model elements
+	glm::vec3 decomposed_scale;
+	glm::quat decomposed_rotation;
+	glm::vec3 decomposed_translation;
+	glm::vec3 decomposed_skew;
+	glm::vec4 decomposed_perspective;
+
 	double horizontal_angle = 0.0;
 	double vertical_angle = -0.977;
 
