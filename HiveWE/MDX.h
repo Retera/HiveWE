@@ -604,9 +604,8 @@ namespace mdx {
 		explicit MDX(BinaryReader& reader);
 		void load(BinaryReader& reader);
 
-		// LOL it doesn't require me to give F the
-		// parameter list for the lambda what is this language
-		//  -- For future user, parameters will be F(NodeContainer& node);
+
+		// parameters will be F(NodeContainer& node);
 		void forEachNode(const std::function<void(NodeContainer&)>& lambda);
 
 		template<typename T>
