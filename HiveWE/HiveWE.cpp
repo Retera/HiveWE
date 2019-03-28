@@ -16,6 +16,8 @@ slk::SLK destructibles_slk;
 slk::SLK destructibles_meta_slk;
 
 HiveWE::HiveWE(QWidget* parent) : QMainWindow(parent) {
+	setAutoFillBackground(true);
+
 	fs::path directory = find_warcraft_directory();
 	while (!fs::exists(directory / "Data") || directory == "") {
 		directory = QFileDialog::getExistingDirectory(this, "Select Warcraft Directory", "/home", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks).toStdWString();
@@ -51,6 +53,7 @@ HiveWE::HiveWE(QWidget* parent) : QMainWindow(parent) {
 	connect(ui.ribbon->lighting_visible, &QPushButton::toggled, [](bool checked) { map->render_lighting = checked; });
 	connect(ui.ribbon->wireframe_visible, &QPushButton::toggled, [](bool checked) { map->render_wireframe = checked; });
 	connect(ui.ribbon->debug_visible, &QPushButton::toggled, [](bool checked) { map->render_debug = checked; });
+	connect(ui.ribbon->minimap_visible, &QPushButton::toggled, [&](bool checked) { (checked) ? minimap->show() : minimap->hide(); });
 
 	connect(new QShortcut(Qt::Key_U, this), &QShortcut::activated, ui.ribbon->units_visible, &QPushButton::click);
 	connect(new QShortcut(Qt::Key_D, this), &QShortcut::activated, ui.ribbon->doodads_visible, &QPushButton::click);
@@ -59,8 +62,19 @@ HiveWE::HiveWE(QWidget* parent) : QMainWindow(parent) {
 	connect(new QShortcut(Qt::Key_T, this), &QShortcut::activated, ui.ribbon->wireframe_visible, &QPushButton::click);
 	connect(new QShortcut(Qt::Key_F3, this), &QShortcut::activated, ui.ribbon->debug_visible, &QPushButton::click);
 
+	// Reload theme
+	connect(new QShortcut(Qt::Key_F5, this), &QShortcut::activated, [&]() {
+		QSettings settings;
+		QFile file("Data/Themes/" + settings.value("theme").toString() + ".qss");
+		file.open(QFile::ReadOnly);
+		QString StyleSheet = QLatin1String(file.readAll());
+
+		qApp->setStyleSheet(StyleSheet);
+	});
+
 	connect(ui.ribbon->reset_camera, &QPushButton::clicked, [&]() { camera->reset(); });
 	connect(ui.ribbon->switch_camera, &QPushButton::clicked, this, &HiveWE::switch_camera);
+	setAutoFillBackground(true);
 
 	connect(new QShortcut(Qt::Key_F1, this), &QShortcut::activated, ui.ribbon->switch_camera, &QPushButton::click);
 	connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_C), this), &QShortcut::activated, ui.ribbon->reset_camera, &QPushButton::click);
@@ -107,28 +121,34 @@ HiveWE::HiveWE(QWidget* parent) : QMainWindow(parent) {
 			palette->close();
 		});
 	});
-
-	// Temporary Temporary
-	//QTimer::singleShot(5, [this]() {
-	//	auto palette = new DoodadPalette(this);
-	//	connect(palette, &Palette::ribbon_tab_requested, this, &HiveWE::set_current_custom_tab);
-	//	connect(this, &HiveWE::palette_changed, palette, &Palette::deactivate);
-	//	connect(palette, &Palette::finished, [&]() {
-	//		remove_custom_tab();
-	//		disconnect(this, &HiveWE::palette_changed, palette, &Palette::deactivate);
-	//	});
-	//});
+	setAutoFillBackground(true);
 
 	connect(ui.ribbon->import_manager, &QRibbonButton::clicked, []() { window_handler.create_or_raise<ImportManager>(); });
-	connect(ui.ribbon->trigger_viewer, &QRibbonButton::clicked, []() { window_handler.create_or_raise<TriggerEditor>(); });
+	connect(ui.ribbon->trigger_editor, &QRibbonButton::clicked, [this]() { 
+		auto editor = window_handler.create_or_raise<TriggerEditor>();
+		connect(this, &HiveWE::saving_initiated, editor, &TriggerEditor::save_changes, Qt::UniqueConnection);
+	});
 
 	minimap->setParent(ui.widget);
 	minimap->move(10, 10);
 	minimap->show();
 
+	// Temporary Temporary
+	//QTimer::singleShot(5, [this]() {
+	//	auto editor = window_handler.create_or_raise<TriggerEditor>();
+	//	connect(this, &HiveWE::saving_initiated, editor, &TriggerEditor::save_changes, Qt::UniqueConnection);
+	//});
+
 	connect(minimap, &Minimap::clicked, [](QPointF location) { camera->position = { location.x() * map->terrain.width, (1.0 - location.y()) * map->terrain.height ,camera->position.z };  });
 	connect(&map->terrain, &Terrain::minimap_changed, minimap, &Minimap::set_minimap);
 	map->load("Data/Test.w3x");
+
+	//QTimer::singleShot(50, [this]() {
+	//	auto palette = new TerrainPalette(this);
+	//	palette->move(width() - palette->width() - 10, ui.widget->y() + 29);
+	//	connect(palette, &TerrainPalette::ribbon_tab_requested, this, &HiveWE::set_current_custom_tab);
+	//	connect(palette, &DoodadPalette::finished, this, &HiveWE::remove_custom_tab);
+	//});
 }
 
 void HiveWE::load() {
@@ -169,16 +189,19 @@ void HiveWE::save_as() {
 		"Warcraft III Scenario (*.w3x)");
 
 	if (file_name != "") {
+		emit saving_initiated();
 		map->save(file_name.toStdString());
 	}
 }
 
 void HiveWE::closeEvent(QCloseEvent* event) {
-	//int choice = QMessageBox::question(this, "Do you want to quit?", "Are you sure you want to quit?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+	int choice = QMessageBox::question(this, "Do you want to quit?", "Are you sure you want to quit?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 
-	//if (choice == QMessageBox::Yes) {
-	//}
-	event->accept();
+	if (choice == QMessageBox::Yes) {
+		event->accept();
+	} else {
+		event->ignore();
+	}
 }
 
 void HiveWE::switch_warcraft() {

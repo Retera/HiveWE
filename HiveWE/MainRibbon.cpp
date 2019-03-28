@@ -16,10 +16,10 @@ MainRibbon::MainRibbon(QWidget* parent) : QRibbon(parent) {
 	redo->setText("Redo");
 	history_section->addWidget(redo);
 
-	view_history->setIcon(QIcon("Data/Icons/Ribbon/description32x32.png"));
-	view_history->setText("View\nHistory");
-	view_history->setEnabled(false);
-	history_section->addWidget(view_history);
+	//view_history->setIcon(QIcon("Data/Icons/Ribbon/description32x32.png"));
+	//view_history->setText("View\nHistory");
+	//view_history->setEnabled(false);
+	//history_section->addWidget(view_history);
 
 	/*copy->setIcon(QIcon("Data/Icons/Ribbon/copy32x32.ico"));
 	copy->setText("Copy");
@@ -94,6 +94,11 @@ MainRibbon::MainRibbon(QWidget* parent) : QRibbon(parent) {
 	debug_visible->setCheckable(true);
 	visible_section->addWidget(debug_visible);
 
+	minimap_visible->setIcon(QIcon("Data/Icons/Ribbon/minimap32x32.png"));
+	minimap_visible->setText("Minimap");
+	minimap_visible->setCheckable(true);
+	minimap_visible->setChecked(true);
+	visible_section->addWidget(minimap_visible);
 	// Camera section
 	QRibbonSection* camera_section = new QRibbonSection;
 	camera_section->setText("Camera");
@@ -222,9 +227,9 @@ MainRibbon::MainRibbon(QWidget* parent) : QRibbon(parent) {
 	import_manager->setText("Import\nManager");
 	editor_section->addWidget(import_manager);
 
-	trigger_viewer->setIcon(QIcon("Data/Icons/Ribbon/triggereditor32x32.png"));
-	trigger_viewer->setText("Trigger\nViewer");
-	editor_section->addWidget(trigger_viewer);
+	trigger_editor->setIcon(QIcon("Data/Icons/Ribbon/triggereditor32x32.png"));
+	trigger_editor->setText("Trigger\nEditor");
+	editor_section->addWidget(trigger_editor);
 
 	QRibbonSection* palette_section = new QRibbonSection;
 	palette_section->setText("Palette"); 

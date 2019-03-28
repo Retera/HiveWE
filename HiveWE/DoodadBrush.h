@@ -26,7 +26,7 @@ public:
 	float rotation = 0.f;
 
 	std::vector<Doodad*> selections;
-	std::unique_ptr<DoodadAddAction> test;
+	std::unique_ptr<DoodadAddAction> doodad_undo;
 
 	DoodadBrush();
 
@@ -36,6 +36,7 @@ public:
 	void mouse_release_event(QMouseEvent* event) override;
 	void mouse_move_event(QMouseEvent* event) override;
 
+	void delete_selection();
 	void clear_selection() override;
 
 	void apply_begin() override;

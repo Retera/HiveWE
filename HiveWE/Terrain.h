@@ -12,6 +12,7 @@ struct Corner {
 	bool water;
 	bool boundary;
 	bool cliff = false;
+	bool romp = false;
 
 	int ground_variation;
 	int cliff_variation;
@@ -116,8 +117,8 @@ public:
 
 	~Terrain();
 
-	void create();
 	bool load(BinaryReader& reader);
+	void create();
 	void save() const;
 	void render() const;
 
@@ -126,6 +127,10 @@ public:
 	int real_tile_texture(int x, int y) const;
 	int get_tile_variation(int ground_texture, int variation) const;
 	glm::u16vec4 get_texture_variations(int x, int y) const;
+
+	//bool is_corner_ramp_mesh(int x, int y);
+	bool is_corner_ramp_entrance(int x, int y);
+	//bool is_corner_cliff(int x, int y);
 
 	Texture minimap_image();
 

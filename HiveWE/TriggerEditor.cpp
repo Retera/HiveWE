@@ -17,7 +17,7 @@ TriggerEditor::TriggerEditor(QWidget* parent) : QMainWindow(parent) {
 	condition_icon = texture_to_icon(world_edit_data.data("WorldEditArt", "SEIcon_Condition"));
 	action_icon = texture_to_icon(world_edit_data.data("WorldEditArt", "SEIcon_Action"));
 
-	for (auto&& i : map->triggers.categories) {
+	for (const auto& i : map->triggers.categories) {
 		QTreeWidgetItem* item = new QTreeWidgetItem(ui.explorer);
 		item->setData(0, Qt::EditRole, QString::fromStdString(i.name));
 		item->setIcon(0, folder_icon);
@@ -67,7 +67,9 @@ void TriggerEditor::item_clicked(QTreeWidgetItem* item) {
 		JassEditor* edit = new JassEditor;
 		layout->addWidget(edit);
 		edit->setText(QString::fromStdString(trigger.custom_text));
-		edit->setReadOnly(true);
+		connect(this, &TriggerEditor::save_changes, [=]() {
+			files.at(item).get().custom_text = edit->text().toStdString();
+		});
 	} else {
 		QTreeWidget* edit = new QTreeWidget;
 		edit->setHeaderHidden(true);

@@ -22,6 +22,7 @@ struct Doodad {
 
 	int editor_id;
 
+	// Auxilirary data
 	glm::mat4 matrix = glm::mat4(1.f);
 	std::shared_ptr<StaticMesh> mesh;
 	std::shared_ptr<Texture> pathing;
@@ -65,8 +66,10 @@ public:
 	Doodad& add_doodad(std::string id, int variation, glm::vec3 position);
 	void remove_doodad(Doodad* doodad);
 
-	std::vector<Doodad*> query_area(QRectF area);
+	std::vector<Doodad*> query_area(const QRectF& area);
 	void remove_doodads(const std::vector<Doodad*>& list);
+
+	void update_doodad_pathing(const QRectF& area);
 
 	std::shared_ptr<StaticMesh> get_mesh(std::string id, int variation);
 };
